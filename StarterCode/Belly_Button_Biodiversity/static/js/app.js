@@ -11,21 +11,24 @@ function buildMetadata(sample) {
 
     // append each metadata key and values 
     Object.entries(data).forEach(([key, value]) => {
-      selector.append("p")
-      .text(`${key}:${value}`);
+      selector.append("div")
+      .text(`${key}: `);
+      selector.append("p").text(value)
       });
     });
 };
 
 function buildCharts(sample) {
-
+console.log(sample)
   // @TODO: Use `d3.json` to fetch the sample data for the plots
   var defaultURL = `/samples/${sample}`; 
     d3.json(defaultURL).then((data) => {
     console.log(data);  
     var values = data.sample_values.slice(0,10);
-    var labels = data.otu_id;
-  
+    var labels = data.otu_labels.slice(0,10);
+    var ids = data.otu_ids.slice(0,10);
+    console.log(labels);
+
   // @TODO: Build a Bubble Chart using the sample data
   // @TODO: Build a Pie Chart
 
@@ -37,7 +40,8 @@ function buildCharts(sample) {
   // function pieChart() {
     var trace = [{
       "values": values,
-      "labels": labels,
+      "labels": ids,
+      "hovertext": labels,
       "type": "pie"
     }];
 
@@ -45,15 +49,18 @@ function buildCharts(sample) {
       height: 600,
       width: 800
     };
+
+    var trace1 = [{
+      x : ids,
+      y : values,
+      mode : 'markers',
+      marker: {
+        size: values
+      }
+    }];
+
   Plotly.plot("pie", trace, layout);
-  
-  // pieChart(sample);
-
-
-  // function updatePlotly(newdata) {
-  //   var PIE = document.getElementById("pie");
-  //   Plotly.restyle(PIE, "values", [newdata]);
-  // };
+  Plotly.plot("bubble", trace1, layout);
     });
 };
 // };
@@ -75,6 +82,7 @@ function init() {
       var firstSample = sampleNames[0];
       buildCharts(firstSample);
       buildMetadata(firstSample);
+      console.log(firstSample);
     });
   
 };
